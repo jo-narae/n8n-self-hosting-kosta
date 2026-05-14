@@ -1,0 +1,33 @@
+# n8n 로컬 실행 (http://localhost:5678)
+# 외부 노출이 필요해지면 아래 ngrok 블록과 TUNNEL_* 환경변수 주석을 해제하고
+# .env 에 NGROK_AUTHTOKEN, TUNNEL_DOMAIN 을 설정한다.
+
+services:
+  n8n:
+    image: n8nio/n8n:2.18.5
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - GENERIC_TIMEZONE=Asia/Seoul
+      - TZ=Asia/Seoul
+      # --- ngrok 터널 사용 시 해제 ---
+      # - N8N_HOST=${TUNNEL_DOMAIN}
+      # - N8N_PROTOCOL=https
+      # - WEBHOOK_URL=https://${TUNNEL_DOMAIN}
+      # - N8N_EDITOR_BASE_URL=https://${TUNNEL_DOMAIN}
+      # - N8N_PROXY_HOPS=1
+    volumes:
+      - ./n8n_data:/home/node/.n8n
+
+  # --- ngrok 터널 사용 시 해제 ---
+  # ngrok:
+  #   image: ngrok/ngrok:latest
+  #   container_name: n8n-tunnel
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - n8n
+  #   environment:
+  #     - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+  #   command: http --url=${TUNNEL_DOMAIN} n8n:5678
